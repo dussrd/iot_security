@@ -155,3 +155,7 @@ CORS_ORIGIN_ALLOW_ALL = True
 # CORS_ORIGIN_WHITELIST = (
 #     'http://localhost:4200',
 # )
+
+CORS_ALLOWED_ORIGINS = [
+    "https://iotsecurity-production.up.railway.app",
+]
