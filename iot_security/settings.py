@@ -27,7 +27,7 @@ SECRET_KEY = "django-insecure-3@yjlfk+q@dl^=ty6n#!t39u#on!4n3^hvxh0k8x09(#1=jh=v
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    ".up.railway.app",
+    "iotsecurity-production.up.railway.app",
     "127.0.0.1",
     "localhost",
 ]
@@ -156,6 +156,6 @@ CORS_ORIGIN_ALLOW_ALL = True
 #     'http://localhost:4200',
 # )
 
-CORS_ALLOWED_ORIGINS = [
+CSRF_TRUSTED_ORIGINS = [
     "https://iotsecurity-production.up.railway.app",
 ]
