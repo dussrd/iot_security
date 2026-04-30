@@ -1,13 +1,13 @@
+from django.contrib.auth.hashers import check_password, identify_hasher, make_password
 from django.db import models
 
 
 class AppUser(models.Model):
     home = models.ForeignKey(
-        "core.Home",
-        on_delete=models.CASCADE,
-        related_name="users"
+        "core.Home", on_delete=models.CASCADE, related_name="users"
     )
     full_name = models.CharField(max_length=100)
+    username = models.CharField(max_length=150, unique=True)
     email = models.EmailField(max_length=150, unique=True)
     password_hash = models.CharField(max_length=255)
     phone = models.CharField(max_length=20, null=True, blank=True)
@@ -21,6 +21,39 @@ class AppUser(models.Model):
 
     def __str__(self):
         return self.full_name
+
+    @property
+    def is_authenticated(self):
+        return True
+
+    @property
+    def is_anonymous(self):
+        return False
+
+    @property
+    def is_app_admin(self):
+        return self.has_role("admin")
+
+    def has_role(self, role_name):
+        return self.user_roles.filter(role__role_name__iexact=role_name).exists()
+
+    def set_password(self, raw_password):
+        self.password_hash = make_password(raw_password)
+
+    def check_password(self, raw_password):
+        if check_password(raw_password, self.password_hash):
+            return True
+
+        return raw_password == self.password_hash
+
+    def save(self, *args, **kwargs):
+        if self.password_hash:
+            try:
+                identify_hasher(self.password_hash)
+            except ValueError:
+                self.set_password(self.password_hash)
+
+        super().save(*args, **kwargs)
 
 
 class Role(models.Model):
@@ -37,22 +70,16 @@ class Role(models.Model):
 
 class UserRole(models.Model):
     user = models.ForeignKey(
-        AppUser,
-        on_delete=models.CASCADE,
-        related_name="user_roles"
+        AppUser, on_delete=models.CASCADE, related_name="user_roles"
     )
-    role = models.ForeignKey(
-        Role,
-        on_delete=models.CASCADE,
-        related_name="user_roles"
-    )
+    role = models.ForeignKey(Role, on_delete=models.CASCADE, related_name="user_roles")
     assignment_date = models.DateTimeField(auto_now_add=True)
     assigned_by = models.ForeignKey(
         AppUser,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="assigned_roles"
+        related_name="assigned_roles",
     )
 
     class Meta:
@@ -78,14 +105,9 @@ class Notification(models.Model):
     ]
 
     user = models.ForeignKey(
-        AppUser,
-        on_delete=models.CASCADE,
-        related_name="notifications"
+        AppUser, on_delete=models.CASCADE, related_name="notifications"
     )
-    notification_type = models.CharField(
-        max_length=20,
-        choices=NOTIFICATION_TYPES
-    )
+    notification_type = models.CharField(max_length=20, choices=NOTIFICATION_TYPES)
     title = models.CharField(max_length=150)
     message = models.TextField()
     channel = models.CharField(max_length=20, choices=CHANNELS)
@@ -111,7 +133,7 @@ class SystemAudit(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="system_audits"
+        related_name="system_audits",
     )
     action = models.CharField(max_length=100)
     affected_entity = models.CharField(max_length=50)

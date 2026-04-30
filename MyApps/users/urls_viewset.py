@@ -5,16 +5,17 @@ from .views_viewset import (
     RoleViewSet,
     UserRoleViewSet,
     NotificationViewSet,
-    SystemAuditViewSet
+    SystemAuditViewSet,
 )
 
 router = DefaultRouter()
-router.register(r'users', AppUserViewSet)
-router.register(r'roles', RoleViewSet)
-router.register(r'user-roles', UserRoleViewSet)
-router.register(r'notifications', NotificationViewSet)
-router.register(r'system-audits', SystemAuditViewSet)
+router.register(r"users", AppUserViewSet)
+router.register(r"roles", RoleViewSet)
+router.register(r"user-roles", UserRoleViewSet)
+router.register(r"notifications", NotificationViewSet)
+router.register(r"system-audits", SystemAuditViewSet)
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path("login/", AppUserViewSet.as_view({"post": "login"}), name="appuser-login"),
+    path("", include(router.urls)),
 ]

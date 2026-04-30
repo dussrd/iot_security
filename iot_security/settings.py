@@ -46,13 +46,22 @@ INSTALLED_APPS = [
     "MyApps.users.apps.UsersConfig",
     "MyApps.core.apps.CoreConfig",
     "MyApps.automation.apps.AutomationConfig",
-    'rest_framework',
+    "rest_framework",
     # CORS
-    'corsheaders',
+    "corsheaders",
 ]
 
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "MyApps.users.authentication.AppUserTokenAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "MyApps.users.permissions.IsAppAdminOrReadOnly",
+    ],
+}
+
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -87,26 +96,26 @@ WSGI_APPLICATION = "iot_security.wsgi.application"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 # Get the selected database engine from environment
-DATABASE_ENGINE = config('DATABASE_ENGINE', default='mysql')
+DATABASE_ENGINE = config("DATABASE_ENGINE", default="mysql")
 
 # Database configurations
 DATABASE_CONFIGS = {
-    'mysql': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': config('MYSQL_NAME'),
-        'USER': config('MYSQL_USER'),
-        'PASSWORD': config('MYSQL_PASSWORD'),
-        'HOST': config('MYSQL_HOST'),
-        'PORT': config('MYSQL_PORT'),
-        'OPTIONS': {
-            'charset': 'utf8mb4',
+    "mysql": {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": config("MYSQL_NAME"),
+        "USER": config("MYSQL_USER"),
+        "PASSWORD": config("MYSQL_PASSWORD"),
+        "HOST": config("MYSQL_HOST"),
+        "PORT": config("MYSQL_PORT"),
+        "OPTIONS": {
+            "charset": "utf8mb4",
         },
     },
 }
 
 # Set the database configuration based on the selected engine
 DATABASES = {
-    'default': DATABASE_CONFIGS.get(DATABASE_ENGINE, DATABASE_CONFIGS['mysql'])
+    "default": DATABASE_CONFIGS.get(DATABASE_ENGINE, DATABASE_CONFIGS["mysql"])
 }
 
 
@@ -132,9 +141,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
-LANGUAGE_CODE = 'es'
+LANGUAGE_CODE = "es"
 
-TIME_ZONE = 'America/Bogota'
+TIME_ZONE = "America/Bogota"
 
 USE_I18N = True
 
