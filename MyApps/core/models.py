@@ -1,14 +1,79 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 
-# Create your models here.
-from django.db import models
+
+CITY_NEIGHBORHOODS = {
+    "riohacha": {
+        "label": "Riohacha",
+        "barrios": [
+            ("centro", "Centro"),
+            ("los_olivos", "Los Olivos"),
+            ("cooperativo", "Cooperativo"),
+            ("marbella", "Marbella"),
+            ("villa_comfamiliar", "Villa Comfamiliar"),
+        ],
+    },
+    "maicao": {
+        "label": "Maicao",
+        "barrios": [
+            ("centro", "Centro"),
+            ("san_francisco", "San Francisco"),
+            ("la_floresta", "La Floresta"),
+            ("el_carmen", "El Carmen"),
+            ("villa_amelia", "Villa Amelia"),
+        ],
+    },
+    "barranquilla": {
+        "label": "Barranquilla",
+        "barrios": [
+            ("el_prado", "El Prado"),
+            ("alto_prado", "Alto Prado"),
+            ("riomar", "Riomar"),
+            ("boston", "Boston"),
+            ("ciudad_jardin", "Ciudad Jardin"),
+        ],
+    },
+    "bogota": {
+        "label": "Bogota",
+        "barrios": [
+            ("chapinero", "Chapinero"),
+            ("usaquen", "Usaquen"),
+            ("suba", "Suba"),
+            ("teusaquillo", "Teusaquillo"),
+            ("kennedy", "Kennedy"),
+        ],
+    },
+    "medellin": {
+        "label": "Medellin",
+        "barrios": [
+            ("el_poblado", "El Poblado"),
+            ("laureles", "Laureles"),
+            ("belen", "Belen"),
+            ("robledo", "Robledo"),
+            ("guayabal", "Guayabal"),
+        ],
+    },
+}
+
+CITY_CHOICES = [
+    (city_key, city_data["label"])
+    for city_key, city_data in CITY_NEIGHBORHOODS.items()
+]
+NEIGHBORHOOD_CHOICES = list(
+    {
+        neighborhood_key: neighborhood_label
+        for city_data in CITY_NEIGHBORHOODS.values()
+        for neighborhood_key, neighborhood_label in city_data["barrios"]
+    }.items()
+)
 
 
 class Home(models.Model):
     home_name = models.CharField(max_length=100)
     address = models.CharField(max_length=255)
-    city = models.CharField(max_length=100)
-    country = models.CharField(max_length=100, default="Colombia")
+    city = models.CharField(max_length=100, choices=CITY_CHOICES, default="riohacha")
+    barrio = models.CharField(max_length=100, choices=NEIGHBORHOOD_CHOICES, default="centro")
+    country = models.CharField(max_length=100, default="Colombia", editable=False)
     registration_date = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
 
@@ -17,6 +82,25 @@ class Home(models.Model):
 
     def __str__(self):
         return self.home_name
+
+    def clean(self):
+        valid_neighborhoods = {
+            neighborhood_key
+            for neighborhood_key, _ in CITY_NEIGHBORHOODS.get(
+                self.city,
+                {"barrios": []},
+            )["barrios"]
+        }
+
+        if self.barrio not in valid_neighborhoods:
+            raise ValidationError(
+                {"barrio": "El barrio seleccionado no pertenece a la ciudad."}
+            )
+
+    def save(self, *args, **kwargs):
+        self.country = "Colombia"
+        self.full_clean()
+        super().save(*args, **kwargs)
 
 
 class HomeZone(models.Model):

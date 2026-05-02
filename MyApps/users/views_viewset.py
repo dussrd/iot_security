@@ -17,12 +17,12 @@ from .serializers import (
 )
 
 
-class AppUserViewSet(viewsets.ModelViewSet):
+class AppUserViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = AppUser.objects.all()
     serializer_class = AppUserSerializer
 
     def get_permissions(self):
-        if self.action in ("create", "login"):
+        if self.action == "login":
             return [AllowAny()]
 
         return [IsAppAdminOrReadOnly()]
@@ -50,12 +50,12 @@ class AppUserViewSet(viewsets.ModelViewSet):
         )
 
 
-class RoleViewSet(viewsets.ModelViewSet):
+class RoleViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Role.objects.all()
     serializer_class = RoleSerializer
 
 
-class UserRoleViewSet(viewsets.ModelViewSet):
+class UserRoleViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = UserRole.objects.all()
     serializer_class = UserRoleSerializer
 

@@ -1,11 +1,64 @@
 from django.contrib import admin
+from django import forms
 from .models import AppUser, Role, UserRole, Notification, SystemAudit
+
+
+class AppUserAdminForm(forms.ModelForm):
+    password = forms.CharField(
+        label="Contrasena",
+        required=False,
+        widget=forms.PasswordInput(render_value=False),
+        help_text="Deja este campo vacio para conservar la contrasena actual.",
+    )
+
+    class Meta:
+        model = AppUser
+        fields = (
+            "home",
+            "full_name",
+            "username",
+            "email",
+            "password",
+            "phone",
+            "is_active",
+            "last_access",
+            "recovery_token",
+        )
+
+    def clean_password(self):
+        password = self.cleaned_data.get("password")
+
+        if not self.instance.pk and not password:
+            raise forms.ValidationError("La contrasena es obligatoria.")
+
+        return password
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        password = self.cleaned_data.get("password")
+
+        if password:
+            user.set_password(password)
+
+        if commit:
+            user.save()
+            self.save_m2m()
+
+        return user
+
+
+class UserRoleInline(admin.TabularInline):
+    model = UserRole
+    extra = 1
+    fk_name = "user"
 
 
 @admin.register(AppUser)
 class AppUserAdmin(admin.ModelAdmin):
-    list_display = ("id", "full_name", "email", "home", "is_active")
-    search_fields = ("full_name", "email")
+    form = AppUserAdminForm
+    inlines = [UserRoleInline]
+    list_display = ("id", "full_name", "username", "email", "home", "is_active")
+    search_fields = ("full_name", "username", "email")
     list_filter = ("is_active",)
 
 

@@ -4,9 +4,18 @@ from .models import Home, HomeZone, SensorReading, MotionEvent, SystemAlert
 
 @admin.register(Home)
 class HomeAdmin(admin.ModelAdmin):
-    list_display = ("id", "home_name", "city", "is_active", "registration_date")
-    search_fields = ("home_name", "city", "address")
-    list_filter = ("is_active", "city")
+    list_display = (
+        "id",
+        "home_name",
+        "city",
+        "barrio",
+        "country",
+        "is_active",
+        "registration_date",
+    )
+    search_fields = ("home_name", "city", "barrio", "address")
+    list_filter = ("is_active", "city", "barrio")
+    readonly_fields = ("country",)
 
 
 @admin.register(HomeZone)
