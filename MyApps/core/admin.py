@@ -7,15 +7,25 @@ class HomeAdmin(admin.ModelAdmin):
     list_display = (
         "id",
         "home_name",
+        "owner",
         "city",
         "barrio",
         "country",
         "is_active",
         "registration_date",
     )
-    search_fields = ("home_name", "city", "barrio", "address")
-    list_filter = ("is_active", "city", "barrio")
+    search_fields = (
+        "home_name",
+        "city",
+        "barrio",
+        "address",
+        "owner__full_name",
+        "owner__username",
+        "owner__email",
+    )
+    list_filter = ("is_active", "city", "barrio", "owner")
     readonly_fields = ("country",)
+    autocomplete_fields = ("owner",)
 
 
 @admin.register(HomeZone)

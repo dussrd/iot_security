@@ -3,9 +3,6 @@ from django.db import models
 
 
 class AppUser(models.Model):
-    home = models.ForeignKey(
-        "core.Home", on_delete=models.CASCADE, related_name="users"
-    )
     full_name = models.CharField(max_length=100)
     username = models.CharField(max_length=150, unique=True)
     email = models.EmailField(max_length=150, unique=True)

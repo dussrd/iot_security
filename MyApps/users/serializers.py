@@ -6,6 +6,7 @@ from .models import AppUser, Notification, Role, SystemAudit, UserRole
 
 
 class AppUserSerializer(serializers.ModelSerializer):
+    home = serializers.SerializerMethodField()
     password = serializers.CharField(write_only=True, required=False)
     password_hash = serializers.CharField(write_only=True, required=False)
     role = serializers.CharField(write_only=True, required=False)
@@ -29,13 +30,16 @@ class AppUserSerializer(serializers.ModelSerializer):
             "role",
             "roles",
         )
-        read_only_fields = ("id", "registration_date", "last_access", "roles")
+        read_only_fields = ("id", "home", "registration_date", "last_access", "roles")
         extra_kwargs = {
             "recovery_token": {"write_only": True, "required": False},
         }
 
     def get_roles(self, obj):
         return list(obj.user_roles.values_list("role__role_name", flat=True))
+
+    def get_home(self, obj):
+        return obj.owned_homes.values_list("id", flat=True).first()
 
     def validate(self, attrs):
         if self.instance is None:

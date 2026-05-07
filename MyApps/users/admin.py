@@ -14,7 +14,6 @@ class AppUserAdminForm(forms.ModelForm):
     class Meta:
         model = AppUser
         fields = (
-            "home",
             "full_name",
             "username",
             "email",
@@ -57,7 +56,7 @@ class UserRoleInline(admin.TabularInline):
 class AppUserAdmin(admin.ModelAdmin):
     form = AppUserAdminForm
     inlines = [UserRoleInline]
-    list_display = ("id", "full_name", "username", "email", "home", "is_active")
+    list_display = ("id", "full_name", "username", "email", "is_active")
     search_fields = ("full_name", "username", "email")
     list_filter = ("is_active",)
 
