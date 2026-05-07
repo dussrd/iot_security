@@ -1,1 +1,2 @@
+release: python manage.py migrate
 web: gunicorn iot_security.wsgi:application --bind 0.0.0.0:$PORT
